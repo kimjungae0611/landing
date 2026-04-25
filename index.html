@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysAI Lab — 몸으로 배우는 AI</title>
+    <link rel="stylesheet" href="style.css">
+    <!--
+        Google Fonts 두 가지 로드:
+        - Orbitron: SF 느낌의 영문 폰트 (로고, 제목)
+        - Noto Sans KR: 한글 본문 폰트
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 별 배경: JS로 그리는 Canvas 요소 -->
+    <canvas id="starCanvas"></canvas>
+
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-logo">Phys<span>AI</span> Lab</div>
+        <ul class="nav-links">
+            <li><a href="#about">소개</a></li>
+            <li><a href="#features">프로그램</a></li>
+            <li><a href="#cta">시작하기</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== HERO 섹션 ===== -->
+    <section class="hero" id="hero">
+
+        <!-- 행성 레이어: 마우스를 따라 움직이는 요소들 -->
+        <div class="planet-container">
+
+            <!-- 메인 행성 (오른쪽 큰 행성) -->
+            <div class="planet-main" id="planetMain">
+                <div class="planet-ring"></div>
+                <div class="planet-surface">
+                    <div class="planet-atmosphere"></div>
+                </div>
+                <div class="planet-glow"></div>
+            </div>
+
+            <!-- 보조 행성들 (패럴랙스 깊이감용) -->
+            <div class="planet-small" id="planetSmall"></div>
+            <div class="planet-tiny" id="planetTiny"></div>
+
+            <!-- 유성은 script.js에서 동적으로 생성됩니다 -->
+        </div>
+
+        <!-- 히어로 텍스트 영역 -->
+        <div class="hero-content">
+            <p class="hero-tag">✦ NEW WORLD EDUCATION ✦</p>
+            <h1 class="hero-title">Phys<span>AI</span><br>Lab</h1>
+            <p class="hero-subtitle">몸으로 배우는 AI</p>
+            <p class="hero-desc">
+                물리적 경험과 인공지능이 만나는<br>
+                새로운 교육의 세계로 함께 나아갑니다.
+            </p>
+            <div class="hero-buttons">
+                <a href="#cta" class="btn-primary">탐험 시작하기</a>
+                <a href="#about" class="btn-secondary">더 알아보기 →</a>
+            </div>
+        </div>
+
+        <!-- 스크롤 유도 애니메이션 -->
+        <div class="scroll-indicator">
+            <span>SCROLL</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ===== ABOUT 섹션 ===== -->
+    <section class="about" id="about">
+        <div class="about-container fade-up">
+            <div class="section-label">ABOUT US</div>
+            <h2 class="section-title">새로운 교육의 <span>우주</span>를<br>함께 열어갑니다</h2>
+            <p class="about-desc">
+                PhysAI Lab은 몸으로 직접 경험하는 AI 교육을 만듭니다.<br>
+                단순한 이론이 아닌, 실제로 만지고 느끼며 배우는 교육으로<br>
+                학생들이 미래 세계를 탐험할 수 있도록 안내합니다.
+            </p>
+
+            <!-- 궤도 애니메이션 비주얼 -->
+            <div class="orbit-visual">
+                <div class="orbit-center">PhysAI</div>
+                <div class="orbit-ring orbit-1">
+                    <div class="orbit-dot">AI</div>
+                </div>
+                <div class="orbit-ring orbit-2">
+                    <div class="orbit-dot">물리</div>
+                </div>
+                <div class="orbit-ring orbit-3">
+                    <div class="orbit-dot">교육</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURES 섹션 ===== -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <div class="section-label fade-up">PROGRAMS</div>
+            <h2 class="section-title fade-up">우리가 여는 <span>세계</span></h2>
+            <div class="features-grid">
+                <div class="feature-card fade-up">
+                    <div class="card-planet"></div>
+                    <div class="card-icon">🤖</div>
+                    <h3>AI 체험 교육</h3>
+                    <p>인공지능을 직접 만지고 조작하며 학습합니다. 머신러닝의 원리를 몸으로 이해하는 독보적인 커리큘럼.</p>
+                </div>
+                <div class="feature-card featured fade-up">
+                    <div class="card-planet featured-planet"></div>
+                    <div class="card-icon">⚛️</div>
+                    <h3>물리 + AI 융합</h3>
+                    <p>물리 현상을 AI로 분석하고 예측합니다. 두 세계의 경계를 허무는 통합적 사고력을 키웁니다.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <div class="card-planet"></div>
+                    <div class="card-icon">🚀</div>
+                    <h3>미래 기술 탐험</h3>
+                    <p>로보틱스, 자율주행, 뇌-컴퓨터 인터페이스까지. 미래 세계를 먼저 경험하는 탐험가를 양성합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA 섹션 ===== -->
+    <section class="cta-section" id="cta">
+        <div class="cta-nebula"></div>
+        <div class="cta-container fade-up">
+            <div class="section-label">JOIN US</div>
+            <h2 class="cta-title">
+                새로운 세계로<br>
+                <span>함께 떠날 준비가</span><br>
+                되셨나요?
+            </h2>
+            <p class="cta-desc">PhysAI Lab과 함께 AI 시대를 먼저 경험하세요</p>
+            <a href="mailto:contact@physailab.com" class="btn-primary btn-large">
+                지금 시작하기 →
+            </a>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">Phys<span>AI</span> Lab</div>
+            <p class="footer-slogan">몸으로 배우는 AI</p>
+            <p class="footer-copy">© 2026 PhysAI Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# 시스템 파일 (Git에 올릴 필요 없는 것들)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 문서 파일
+*.docx
+*.pptx
+*.xlsx

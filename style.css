@@ -1,0 +1,785 @@
+/* ==========================================================
+   CSS 변수 (Custom Properties)
+   -- 색상을 변수로 관리하면 나중에 테마 변경이 쉬워집니다
+   ========================================================== */
+:root {
+    --bg-deep: #030014;        /* 우주의 칠흑 같은 검정 */
+    --purple: #7C3AED;         /* 성운 보라 */
+    --blue: #2563EB;           /* 딥 블루 */
+    --cyan: #06B6D4;           /* 행성 글로우 시안 */
+    --white: #F8FAFC;
+    --gray: #94A3B8;
+    --star-color: #FDE68A;     /* 별빛 노랑 */
+}
+
+/* ==========================================================
+   전역 리셋
+   ========================================================== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;   /* 앵커 링크 클릭 시 부드럽게 스크롤 */
+}
+
+body {
+    background: var(--bg-deep);
+    color: var(--white);
+    font-family: 'Noto Sans KR', sans-serif;
+    overflow-x: hidden;        /* 가로 스크롤 방지 */
+}
+
+/* ==========================================================
+   별 Canvas
+   -- position: fixed 로 스크롤해도 배경에 고정
+   ========================================================== */
+#starCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;      /* 마우스 이벤트가 뒤로 통과하도록 */
+}
+
+/* ==========================================================
+   네비게이션
+   ========================================================== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background: rgba(3, 0, 20, 0.6);
+    backdrop-filter: blur(16px);           /* 유리 질감 블러 */
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.nav-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.nav-logo span {
+    color: var(--cyan);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--gray);
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+/* 호버 시 밑줄 애니메이션 */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--cyan);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--cyan);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* ==========================================================
+   HERO 섹션
+   ========================================================== */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* --- 행성 컨테이너 --- */
+.planet-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* --- 메인 행성 --- */
+.planet-main {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    top: 50%;
+    right: 8%;
+    transform: translateY(-50%);
+    will-change: transform;    /* GPU 레이어 분리 → 부드러운 애니메이션 */
+}
+
+/* 행성 본체 */
+.planet-surface {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 32% 30%,
+        #5B21B6,
+        #1E3A8A 35%,
+        #0C4A6E 60%,
+        #020617 85%
+    );
+    box-shadow:
+        inset -25px -25px 80px rgba(0, 0, 0, 0.9),
+        inset 15px 15px 50px rgba(124, 58, 237, 0.3),
+        0 0 80px rgba(6, 182, 212, 0.25),
+        0 0 160px rgba(124, 58, 237, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 행성 표면 대기 줄무늬 — background-position 이동으로 회전 시뮬레이션 */
+.planet-atmosphere {
+    position: absolute;
+    inset: -20px;                /* 회전 시 모서리 빈틈 방지 */
+    border-radius: 50%;
+    background: repeating-linear-gradient(
+        18deg,
+        transparent,
+        transparent 18px,
+        rgba(139, 92, 246, 0.09) 18px,
+        rgba(139, 92, 246, 0.09) 36px
+    );
+    background-size: 200% 100%;
+    animation: surfaceScroll 5s linear infinite;
+}
+
+@keyframes surfaceScroll {
+    from { background-position: 0 0; }
+    to   { background-position: 400px 0; }
+}
+
+/* 행성 고리 — rotateZ 추가로 회전 애니메이션 */
+.planet-ring {
+    position: absolute;
+    width: 145%;
+    height: 28%;
+    border: 2px solid rgba(6, 182, 212, 0.55);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    box-shadow:
+        0 0 25px rgba(6, 182, 212, 0.35),
+        inset 0 0 15px rgba(6, 182, 212, 0.15);
+    animation: ringRotate 8s linear infinite;
+}
+
+@keyframes ringRotate {
+    from { transform: translate(-50%, -50%) rotateX(74deg) rotateZ(0deg); }
+    to   { transform: translate(-50%, -50%) rotateX(74deg) rotateZ(360deg); }
+}
+
+/* 행성 외부 발광 — 크기를 키워 pulsing 효과 */
+.planet-glow {
+    position: absolute;
+    width: 160%;
+    height: 160%;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(124, 58, 237, 0.18) 0%,
+        rgba(6, 182, 212, 0.08) 40%,
+        transparent 65%
+    );
+    animation: glowPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1);    }
+    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.12); }
+}
+
+/* --- 보조 행성 (작은 것) --- */
+.planet-small {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    top: 18%;
+    left: 14%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 35%,
+        #6D28D9,
+        #1D4ED8 50%,
+        #0F172A
+    );
+    box-shadow:
+        inset -10px -10px 25px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(109, 40, 217, 0.4);
+    will-change: transform;
+}
+
+/* --- 보조 행성 (아주 작은 것) --- */
+.planet-tiny {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    bottom: 22%;
+    left: 28%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 35%,
+        #22D3EE,
+        #1E40AF 50%,
+        #020617
+    );
+    box-shadow:
+        inset -5px -5px 15px rgba(0, 0, 0, 0.8),
+        0 0 25px rgba(6, 182, 212, 0.55);
+    will-change: transform;
+}
+
+/* --- 유성: JS가 동적으로 생성하는 요소의 keyframe --- */
+@keyframes meteorFall {
+    0%   { opacity: 0;   transform: rotate(-45deg) translateY(0px);    }
+    8%   { opacity: 1;                                                  }
+    85%  { opacity: 0.6;                                                }
+    100% { opacity: 0;   transform: rotate(-45deg) translateY(700px);  }
+}
+
+/* --- 히어로 텍스트 --- */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding-left: 8%;
+    max-width: 550px;
+}
+
+.hero-tag {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    margin-bottom: 1.8rem;
+    opacity: 0.75;
+}
+
+/* 그라데이션 텍스트 기법:
+   배경에 그라데이션 → 텍스트 모양으로 잘라냄 */
+.hero-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(140deg, #FFFFFF 0%, #C4B5FD 50%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-title span {
+    background: linear-gradient(135deg, #06B6D4, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    letter-spacing: 3px;
+}
+
+.hero-desc {
+    font-size: 1rem;
+    color: var(--gray);
+    line-height: 1.9;
+    margin-bottom: 2.8rem;
+}
+
+/* --- 버튼 --- */
+.hero-buttons {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 0.9rem 2.2rem;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    transition: all 0.35s ease;
+    box-shadow: 0 0 35px rgba(124, 58, 237, 0.45);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 버튼 빛 번짐 효과 */
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 60px rgba(124, 58, 237, 0.65);
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 0.9rem 2.2rem;
+    color: var(--gray);
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    transition: all 0.35s ease;
+    letter-spacing: 0.5px;
+}
+
+.btn-secondary:hover {
+    color: var(--white);
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+.btn-large {
+    font-size: 1.05rem;
+    padding: 1.1rem 3rem;
+}
+
+/* --- 스크롤 인디케이터 --- */
+.scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--gray);
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(6, 182, 212, 0.8), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+    50%       { opacity: 1;   transform: scaleY(1.1); }
+}
+
+/* ==========================================================
+   ABOUT 섹션
+   ========================================================== */
+.about {
+    position: relative;
+    z-index: 1;
+    padding: 9rem 4rem;
+    text-align: center;
+}
+
+/* 섹션 공통 레이블 */
+.section-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 6px;
+    color: var(--cyan);
+    margin-bottom: 1.2rem;
+    opacity: 0.65;
+}
+
+.section-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 1.8rem;
+}
+
+.section-title span {
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-desc {
+    color: var(--gray);
+    line-height: 2.1;
+    font-size: 1.05rem;
+    margin-bottom: 5rem;
+}
+
+/* --- 궤도 비주얼 --- */
+.orbit-visual {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
+}
+
+.orbit-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    box-shadow:
+        0 0 40px rgba(124, 58, 237, 0.5),
+        0 0 80px rgba(124, 58, 237, 0.2);
+    z-index: 2;
+}
+
+.orbit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.orbit-1 {
+    width: 140px;
+    height: 140px;
+    margin: -70px 0 0 -70px;
+    animation: orbitSpin 5s linear infinite;
+}
+.orbit-2 {
+    width: 210px;
+    height: 210px;
+    margin: -105px 0 0 -105px;
+    animation: orbitSpin 9s linear infinite reverse;
+}
+.orbit-3 {
+    width: 300px;
+    height: 300px;
+    margin: -150px 0 0 -150px;
+    animation: orbitSpin 14s linear infinite;
+}
+
+.orbit-dot {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.65);
+}
+
+@keyframes orbitSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg);   }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ==========================================================
+   FEATURES 섹션
+   ========================================================== */
+.features {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 4rem 8rem;
+}
+
+.features-container {
+    text-align: center;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 24px;
+    padding: 2.8rem 2rem;
+    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+}
+
+/* 카드 배경 그라데이션 오버레이 */
+.feature-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124,58,237,0.06), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 24px;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 25px 70px rgba(124, 58, 237, 0.2);
+}
+
+.feature-card:hover::after {
+    opacity: 1;
+}
+
+/* 중앙 카드 강조 스타일 */
+.feature-card.featured {
+    border-color: rgba(6, 182, 212, 0.35);
+    background: rgba(6, 182, 212, 0.04);
+    box-shadow: 0 0 50px rgba(124, 58, 237, 0.12);
+}
+
+/* 카드 안 작은 행성 장식 */
+.card-planet {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    top: -20px;
+    right: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(124,58,237,0.4), rgba(37,99,235,0.2), transparent);
+    opacity: 0.5;
+}
+
+.featured-planet {
+    background: radial-gradient(circle at 35% 35%, rgba(6,182,212,0.5), rgba(37,99,235,0.3), transparent);
+}
+
+.card-icon {
+    font-size: 2.4rem;
+    margin-bottom: 1.3rem;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.feature-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+    color: var(--white);
+    position: relative;
+    z-index: 1;
+}
+
+.feature-card p {
+    font-size: 0.88rem;
+    color: var(--gray);
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================================
+   CTA 섹션
+   ========================================================== */
+.cta-section {
+    position: relative;
+    z-index: 1;
+    padding: 9rem 4rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* 성운 배경 발광 */
+.cta-nebula {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(124, 58, 237, 0.18) 0%,
+        rgba(37, 99, 235, 0.08) 40%,
+        transparent 70%
+    );
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: blur(20px);
+}
+
+.cta-title {
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-title span {
+    background: linear-gradient(135deg, #A78BFA, #67E8F9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cta-desc {
+    color: var(--gray);
+    margin-bottom: 2.8rem;
+    font-size: 1.05rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================================
+   푸터
+   ========================================================== */
+.footer {
+    position: relative;
+    z-index: 1;
+    padding: 3.5rem;
+    text-align: center;
+    border-top: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.footer-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: 3px;
+}
+
+.footer-logo span {
+    color: var(--cyan);
+}
+
+.footer-slogan {
+    color: var(--gray);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+.footer-copy {
+    color: rgba(148, 163, 184, 0.35);
+    font-size: 0.78rem;
+}
+
+/* ==========================================================
+   스크롤 진입 애니메이션
+   -- JS의 IntersectionObserver가 .visible 클래스를 추가합니다
+   ========================================================== */
+.fade-up {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 카드마다 진입 시간 차이를 줘서 순서대로 나타나게 */
+.features-grid .feature-card:nth-child(1) { transition-delay: 0s;    }
+.features-grid .feature-card:nth-child(2) { transition-delay: 0.15s; }
+.features-grid .feature-card:nth-child(3) { transition-delay: 0.3s;  }
+
+/* ==========================================================
+   반응형 (모바일)
+   ========================================================== */
+@media (max-width: 768px) {
+    .navbar { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+
+    .hero-content {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .hero-title { font-size: 3rem; }
+    .hero-subtitle { font-size: 1.4rem; }
+
+    .planet-main {
+        width: 220px;
+        height: 220px;
+        right: -5%;
+        opacity: 0.5;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title { font-size: 2rem; }
+    .cta-title { font-size: 2.2rem; }
+}
